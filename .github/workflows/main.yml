@@ -15,19 +15,19 @@ jobs:
 
       - name: Install xrdp and configure for root
         run: |
-          # Install xrdp
+          # 安裝 xrdp
           sudo apt-get update
           sudo apt-get install -y xrdp
 
-          # Configure xrdp to use the root user
+          # 配置 xrdp 使用 root 用戶
           sudo sed -i 's/allowed_users=console/allowed_users=anybody/' /etc/X11/Xwrapper.config
 
-          # Set up the password for the root user to "admin"
-          echo 'root:frepai' | sudo chpasswd
+          # 為 root 用戶設置一個安全的密碼
+          echo 'root:yangzx@01' | sudo chpasswd
 
       - name: Install ngrok
         run: |
-          # Download ngrok
+          # 下載 ngrok
           wget https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip
           unzip ngrok-stable-linux-amd64.zip
           chmod +x ngrok
@@ -35,28 +35,28 @@ jobs:
 
       - name: Start ngrok TCP tunnel
         run: |
-          # Retrieve the ngrok authtoken from GitHub secrets
+          # 從 GitHub secrets 中獲取 ngrok authtoken
           NGROK_AUTH_TOKEN=${{ secrets.NGROK_AUTH_TOKEN }}
 
-          # Authenticate ngrok using the authtoken
+          # 使用 authtoken 驗證 ngrok
           ngrok authtoken $NGROK_AUTH_TOKEN
 
-          # Start ngrok with port 3389 (RDP) in the EU region
+          # 在歐洲區域使用端口 3389（RDP）啟動 ngrok
           ngrok tcp --region eu 3389 &
 
-          # Sleep for a few seconds to ensure ngrok is running
+          # 等待幾秒確保 ngrok 正在運行
           sleep 5
 
-          # Get the public IP address provided by ngrok
+          # 獲取 ngrok 提供的公共 IP 地址
           public_ip=$(curl -s http://localhost:4040/api/tunnels | jq -r '.tunnels[0].public_url')
 
-          # Output the public IP address
+          # 輸出公共 IP 地址
           echo "Public IP Address: $public_ip"
 
       - name: Keep Alive
         run: |
-          # Add a long-running command to keep the workflow alive
+          # 添加一個長時間運行的命令以保持工作流程運行
           while true; do
             echo "Workflow is running..."
-            sleep 5184000  # Sleep for 1 hour
+            sleep 43200  # 每隔 12 小時休眠
           done
